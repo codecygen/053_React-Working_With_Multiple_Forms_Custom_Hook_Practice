@@ -1,21 +1,27 @@
 import React from 'react';
 import { useState } from 'react';
+import useSubmit from '../hooks/use-submit';
 
 const BasicForm = (props) => {
 
-  const [nameInput, setNameInput] = useState('');
+  const {
+    inputValue: nameInput, 
+    inputChangeHandler: nameInputChangeHandler
+  } = useSubmit();
+
   const [isNameInputTouched, setIsNameInputTouched] = useState(false);
 
   const isNameInputValid = nameInput.trim().length !== 0;
 
-  const isNameValid = isNameInputValid && isNameInputTouched;
+  const nameHasError = !isNameInputValid && isNameInputTouched;
 
-  console.log(nameInput);
-  console.log(isNameValid);
+  let formHasError = true;
 
-  const nameInputChangeHandler = event => {
-    setNameInput(event.target.value);
-  };
+  if (nameHasError) {
+    formHasError = true;
+  } else {
+    formHasError = false;
+  }
 
   const nameInputBlurHandler = event => {
     setIsNameInputTouched(true);
@@ -24,26 +30,36 @@ const BasicForm = (props) => {
   const formSubmitHandler = event => {
     event.preventDefault();
 
-    // console.log(na)
+    if (formHasError) {
+      return;
+    }
+
+    console.log(`Submitted value: ${nameInput}`);
+
+    setIsNameInputTouched(false);
+    // setNameInput('');
   };
 
 
+  const nameInputClass = nameHasError ? 'form-control invalid' : 'form-control';
 
   return (
     <form onSubmit={formSubmitHandler}>
       <div className='control-group'>
 
-        <div className='form-control'>
+        <div className={nameInputClass}>
           <label htmlFor='name'>First Name</label>
           <input
             type='text'
             id='name'
             onChange={nameInputChangeHandler}
             onBlur={nameInputBlurHandler}
+            value={nameInput}
           />
+          {nameHasError && <p className='error-text'>Please entere a valid name.</p>}
         </div>
 
-        <div className='form-control'>
+        {/* <div className='form-control'>
           <label htmlFor='name'>Last Name</label>
           <input type='text' id='name' />
         </div>
@@ -51,7 +67,7 @@ const BasicForm = (props) => {
         <div className='form-control'>
           <label htmlFor='name'>E-Mail Address</label>
           <input type='text' id='name' />
-        </div>
+        </div> */}
         
       </div>
       <div className='form-actions'>
